@@ -1,5 +1,5 @@
 [package]
-name = "driver-template"
+name = "max7219-driver"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,9 +11,11 @@ embedded-hal = "0.2.7"
 [dev-dependencies]
 esp32c3-hal = "0.2.0"
 riscv-rt = { version = "0.9" }
+esp-println = { version = "0.3.0", features = ["esp32c3"] }
 esp-backtrace = { version = "0.3.0", features = [
   "esp32c3",
   "panic-handler",
   "exception-handler",
   "print-uart",
 ] }
+max7219 = "0.3.1"

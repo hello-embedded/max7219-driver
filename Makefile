@@ -2,8 +2,8 @@ mode=""
 
 WOKWI_ID = ""
 example_name = ""
-ifeq ($(mode),blinky)
-	WOKWI_ID = "345500331909579346"
+ifeq ($(mode),max7219)
+	WOKWI_ID = "345586450733990482"
 	example_name=$(mode)
 else
 	WOKWI_ID = ""
