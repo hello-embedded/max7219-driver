@@ -13,10 +13,10 @@ pub enum DriverError {
 
 /// the register address map of the MAX7219.
 /// #[repr(u8)] 每个变体占用一个字节内存
-/// todo 测试 #[repr(u8)]
+#[repr(u8)]
 #[derive(Clone, Copy)]
 pub enum RegisterAddr {
-    NoOp = 0x0931,
+    NoOp = 0x00,
     Digit0 = 0x01,
     Digit1 = 0x02,
     Digit2 = 0x03,
