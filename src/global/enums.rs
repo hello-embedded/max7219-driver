@@ -6,24 +6,17 @@
 #[derive(Debug)]
 pub enum DriverError {
     /// An error occurred when working with SPI
-    SpiError,
+    Spi,
     /// An error occurred when working with a PIN
-    PinError,
+    Pin,
 }
 
-/// commands in the register map of the MAX7219.
-pub enum Command {
-    NoOp = 0x00,
-    DecodeMode = 0x09,
-    Intensity = 0x0A,
-    ScanLimit = 0x0B,
-    Shutdown = 0x0C,
-    DisplayTest = 0x0F,
-}
-/// the MAX7219 digit/row addresses
-#[repr(u8)]
-#[derive(Debug)]
-pub enum DigitRowAddress {
+/// the register address map of the MAX7219.
+/// #[repr(u8)] 每个变体占用一个字节内存
+/// todo 测试 #[repr(u8)]
+#[derive(Clone, Copy)]
+pub enum RegisterAddr {
+    NoOp = 0x0931,
     Digit0 = 0x01,
     Digit1 = 0x02,
     Digit2 = 0x03,
@@ -32,44 +25,31 @@ pub enum DigitRowAddress {
     Digit5 = 0x06,
     Digit6 = 0x07,
     Digit7 = 0x08,
-}
-
-// Implement TryFrom Trait on RowAddress to retrieve corresponding digit
-impl TryFrom<u8> for DigitRowAddress {
-    type Error = u8;
-
-    fn try_from(value: u8) -> Result<Self, Self::Error> {
-        use DigitRowAddress::*;
-
-        Ok(match value {
-            0x01 => Digit0,
-            0x02 => Digit1,
-            0x03 => Digit2,
-            0x04 => Digit3,
-            0x05 => Digit4,
-            0x06 => Digit5,
-            0x07 => Digit6,
-            0x08 => Digit7,
-            invalid => return Err(invalid),
-        })
-    }
+    DecodeMode = 0x09,
+    Intensity = 0x0A,
+    ScanLimit = 0x0B,
+    Shutdown = 0x0C,
+    DisplayTest = 0x0F,
 }
 
 /// the MAX7219 power modes.
-pub enum Power {
+#[repr(u8)]
+pub enum Shutdown {
     ShutdownMode = 0x00,
     NormalOperation = 0x01,
 }
 
 /// the MAX7219 decode modes for BCD encoded input.
+#[repr(u8)]
 pub enum DecodeMode {
-    Nodecode = 0x00,
-    CodeB0 = 0x01,
-    CodeB30 = 0x0F,
-    CodeB70 = 0xFF,
+    NoDecode = 0x00,
+    CodeBDigit0 = 0x01,
+    CodeBDigits3_0 = 0x0F,
+    CodeBDigits7_0 = 0xFF,
 }
 
 /// the MAX7219 supported LED intensity values.
+#[repr(u8)]
 pub enum Intensity {
     Min = 0x00,
     Ratio3_32 = 0x01,
@@ -90,6 +70,7 @@ pub enum Intensity {
 }
 
 /// the MAX7219 display scan limits
+#[repr(u8)]
 pub enum ScanLimit {
     Display0Only = 0x00,
     Display0And1 = 0x01,
@@ -102,6 +83,7 @@ pub enum ScanLimit {
 }
 
 /// the MAX7219 display test modes
+#[repr(u8)]
 pub enum DisplayTest {
     NormalOperationMode = 0x00,
     DisplayTestMode = 0x01,

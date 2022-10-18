@@ -1,3 +1,9 @@
+//! //! MAX7219 Demo
+//!
+//! This example drives an wokwi-max7219-matrix Dot Matrix.
+//! You can see the simulation by [`https://wokwi.com/projects/345754769993761364`]
+//! Max7219 is connected to on the ESP32-C3 boards.
+
 #![no_std]
 #![no_main]
 
@@ -11,7 +17,10 @@ use esp32c3_hal::{
 };
 use esp_backtrace as _;
 use esp_println::println;
-use max7219_driver::{enums::DigitRowAddress, MAX7219};
+use max7219_driver::{
+    global::enums::{DisplayTest, Intensity},
+    MAX7219,
+};
 use riscv_rt::entry;
 
 #[entry]
@@ -50,28 +59,42 @@ fn main() -> ! {
         &clocks,
     );
 
-    let mut max7219 = MAX7219::new(spi, cs).unwrap();
+    let mut max7219 = MAX7219::from_spi_cs(2, spi, cs).unwrap();
 
     // Initialize the Delay peripheral
     let mut delay = Delay::new(&clocks);
 
-    // Application Code
-    // Initialize Display
-    max7219.init_display(true);
+    max7219.power_on().unwrap();
 
     println!("hello max7219!");
-    loop {
-        let mut data: u8 = 1;
-        for addr in 1..9 {
-            max7219.draw_row_or_digit(addr.try_into().unwrap(), data);
-            data = data << 1;
-            delay.delay_ms(500_u32);
-        }
+    let z = [
+        0b0000_0000,
+        0b01111110,
+        0b00100000,
+        0b00010000,
+        0b00001000,
+        0b00000100,
+        0b01111110,
+        0b00000000,
+    ];
+    let h = [
+        0b00000000,
+        0b01000010,
+        0b01000010,
+        0b01111110,
+        0b01111110,
+        0b01000010,
+        0b01000010,
+        0b0000_0000,
+    ];
+    max7219.set_display_test_mode_all(DisplayTest::DisplayTestMode);
+    delay.delay_ms(2000_u32);
 
-        // Clear the LED matrix row by row with 500ms delay in between
-        for addr in 1..9 {
-            max7219.draw_row_or_digit(DigitRowAddress::try_from(addr).unwrap(), data);
-            delay.delay_ms(500_u32);
-        }
+    loop {
+        // test write_raw
+        max7219.write_raw_all(0, &z).unwrap();
+        max7219.write_raw_all(1, &h).unwrap();
+        max7219.set_intensity(0, Intensity::Ratio25_32);
+        max7219.set_intensity(1, Intensity::Ratio5_32);
     }
 }
